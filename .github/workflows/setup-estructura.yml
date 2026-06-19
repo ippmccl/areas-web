@@ -1,0 +1,52 @@
+name: Setup estructura para GitHub Pages
+on:
+  workflow_dispatch:
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Crear directorio assets/ con imágenes
+        run: |
+          mkdir -p assets/carrussel
+
+          # Imágenes raíz → assets/ (sin espacios, extensión minúscula)
+          cp "imagen logo.JPG" assets/imagen-logo.jpg 2>/dev/null || true
+          cp "logo IPP.JPG"    assets/logo-ipp.jpg    2>/dev/null || true
+          cp sobre-mi.jpg      assets/sobre-mi.jpg    2>/dev/null || true
+          cp sobre-mi.png      assets/sobre-mi.png    2>/dev/null || true
+          cp libro.jpg         assets/libro.jpg        2>/dev/null || true
+          cp libro.png         assets/libro.png        2>/dev/null || true
+          cp imagenredonda.JPG assets/imagenredonda.JPG 2>/dev/null || true
+          cp img1.png          assets/img1.png         2>/dev/null || true
+          cp img2.JPG          assets/img2.JPG         2>/dev/null || true
+          cp img3.png          assets/img3.png         2>/dev/null || true
+          cp img4.png          assets/img4.png         2>/dev/null || true
+          cp img5.png          assets/img5.png         2>/dev/null || true
+
+          # Imágenes carrusel (1-10) → assets/carrussel/
+          for i in 1 2 3 4 5 6 7 8 9 10; do
+            [ -f "${i}.jpg" ] && cp "${i}.jpg" "assets/carrussel/${i}.jpg" || true
+            [ -f "${i}.png" ] && cp "${i}.png" "assets/carrussel/${i}.png" || true
+          done
+
+          echo "=== Contenido assets/ ==="
+          ls -la assets/
+          echo "=== Contenido assets/carrussel/ ==="
+          ls -la assets/carrussel/
+
+      - name: Commit y push assets/
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add assets/
+          if git diff --cached --quiet; then
+            echo "Sin cambios que commitear"
+          else
+            git commit -m "chore: crear assets/ con imágenes para GitHub Pages"
+            git push
+          fi
